@@ -1,0 +1,24 @@
+body {
+    background-color: beige; 
+}
+
+.hide {
+	display: none !important;
+}
+
+#start {
+	display: flex;
+	height: 100vh;
+	align-items: center;
+}
+
+#username-form {
+	margin: 0 auto;
+	text-align: center;
+}
+
+#gameboard {
+    width: 600px;
+    height: 400px;
+    background-color: black;
+}

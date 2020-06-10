@@ -11,6 +11,31 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
+    <div id="app">
+        <div id="start" class="container">
+                <form id="username-form">
+                    <div class="form-group">
+                        <input type="text" id="username" class="form-control form-control-lg" required placeholder="Username">
+                    </div>
     
+                    <button type="submit" class="btn btn-primary">Play the game!</button>
+                </form><!-- /#username-form -->
+            </div><!-- /#start -->
+            
+        <div id="game-wrapper" class="hide">
+            <h1>Kill the virus</h1>
+            <div id="gameboard">
+
+            </div>
+
+            <div id="players">
+                <p>Players online</p>
+                <ul id="online-players"></ul>
+
+            </div>
+        </div><!-- /#game-wrapper -->
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="assets/js/game.js"></script>
 </body>
 </html>

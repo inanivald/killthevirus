@@ -9,7 +9,7 @@ require('dotenv').config();
 const app = require('../app');
 const debug = require('debug')('kill-the-virus:server');
 const http = require('http');
-
+const SocketIO = require('socket.io')
 /**
  * Get port from environment and store in Express.
  */
@@ -22,7 +22,21 @@ app.set('port', port);
  */
 
 const server = http.createServer(app);
+const io = SocketIO(server)
 
+io.on('connection', (socket) => {
+  console.log('A client connected')
+
+  socket.on('disconnect', () => {
+    console.log("Someone left the game.")
+  })
+
+  socket.on('player-connected', username => {
+    console.log(`Player ${username} connected to the game.`)
+
+    socket.broadcast.emit('player-connected', username);
+  });
+})
 /**
  * Listen on provided port, on all network interfaces.
  */
