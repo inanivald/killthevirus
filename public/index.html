@@ -21,20 +21,21 @@
                     <button type="submit" class="btn btn-primary">Play the game!</button>
                 </form><!-- /#username-form -->
             </div><!-- /#start -->
-            
-        <div id="game-wrapper" class="hide">
-            <h1>Kill the virus</h1>
-            <div id="gameboard">
+        <div class="container">
+            <div id="game-wrapper" class="hide">
+                <h1>Kill the virus</h1>
+                <div id="gameboard">
 
-            </div>
+                </div> <!-- /#gameboard -->
 
-            <div id="players">
-                <p>Players online</p>
-                <ul id="online-players"></ul>
+                <div id="players">
+                    <p>Players online:</p>
+                    <ul id="online-players"></ul>
 
-            </div>
-        </div><!-- /#game-wrapper -->
-    </div>
+                </div><!-- /#players -->
+            </div><!-- /#game-wrapper -->
+        </div>
+    </div><!-- /#app-->
     <script src="/socket.io/socket.io.js"></script>
     <script src="assets/js/game.js"></script>
 </body>

@@ -6,16 +6,22 @@ const usernameForm = document.querySelector('#username-form');
 
 let username = null;
 
-// get username from form and emit `register-user`-event to server
+const updateOnlinePlayers = (users) => {
+    document.querySelector('#online-players').innerHTML = users.map(user => `<li class="user">${user}</li>`).join("");
+}
+
 usernameForm.addEventListener('submit', e => {
 	e.preventDefault();
 
 	username = document.querySelector('#username').value;
-	socket.emit('player-connected', username) 
+	socket.emit('register-player', username, (status) => {
+        if (status.joinChat) {
+            startEl.classList.add('hide');
+            gameWrapperEl.classList.remove('hide');
+        }
+    })
+});
 
-
-	startEl.classList.add('hide');
-	gameWrapperEl.classList.remove('hide');
-
-
+socket.on('online-players', (users) => {
+	updateOnlinePlayers(users);
 });

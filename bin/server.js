@@ -24,19 +24,9 @@ app.set('port', port);
 const server = http.createServer(app);
 const io = SocketIO(server)
 
-io.on('connection', (socket) => {
-  console.log('A client connected')
 
-  socket.on('disconnect', () => {
-    console.log("Someone left the game.")
-  })
+io.on('connection', require('../controllers/socket_controller'));
 
-  socket.on('player-connected', username => {
-    console.log(`Player ${username} connected to the game.`)
-
-    socket.broadcast.emit('player-connected', username);
-  });
-})
 /**
  * Listen on provided port, on all network interfaces.
  */
