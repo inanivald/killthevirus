@@ -14,6 +14,14 @@ body {
 	align-items: center;
 }
 
+#playagain {
+	display: flex;
+	height: 100vh;
+	align-items: center;
+}
+
+
+
 #username-form {
 	margin: 0 auto;
 	text-align: center;
@@ -41,4 +49,56 @@ body img {
 	padding: 0;
 	list-style: none;
 }
+/* body {
+	background-color: rgb(97, 97, 94);
+}
+
+.hide {
+	display: none !important;
+}
+
+#start {
+	display: flex;
+	height: 100vh;
+	align-items: center;
+}
+
+#playagain {
+	display: flex;
+	height: 100vh;
+	align-items: center;
+}
+#playagain .btn {
+	margin: 1rem
+}
+
+#username-form {
+	margin: 0 auto;
+	text-align: center;
+}
+
+#game-wrapper {
+	display: flex;
+	flex-direction: column;
+}
+
+#gameboard {
+
+    width: 600px;
+	height: 400px;
+	background-color: black;
+  
+}
+
+body img {
+	height: 50px;
+}
+
+#players ul {
+	margin-bottom: 1rem;
+	padding: 0;
+	list-style: none;
+} */
+/* 
+
 

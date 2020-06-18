@@ -75,4 +75,3 @@ module.exports = function(socket) {
 	socket.on('clicked-time', handleClick)
    
 }
-
