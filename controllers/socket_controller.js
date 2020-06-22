@@ -1,26 +1,37 @@
 const users = {};
+let players = [];
 let io = null;
-let time = null;
+let savedClickedTime = {};
+let score = 0;
+let playerClicked = 0;
 
 function getOnlinePlayers() {
 	return Object.values(users);
 }
 
+function handleRegisterUser(username, callback) {
+	users[this.id] = username;
+	callback({
+		joinGame: true,
+		usernameInUse: false,
+		onlineUsers: getOnlinePlayers(),
+	});
+
+	this.broadcast.emit('online-players', getOnlinePlayers());
+}
+
 function randomPositions(y, x) {
 	
 	let onlinePlayers = getOnlinePlayers();
-	console.log('onlinePlayers', onlinePlayers)
 	
 	if (onlinePlayers.length === 2){
 		const randomY = y * Math.random()
 		const randomX = x * Math.random()
 		const seconds = Math.floor(Math.random() * 10)
-		console.log(seconds)
 		setTimeout(function () {
 			const time = Date.now()
 			io.emit('virus-positions', randomY, randomX, time)
-			console.log('time', time)
-		}, seconds * 1000); ;
+		}, seconds * 1000);
 	}
 
 }
@@ -34,33 +45,42 @@ function handleUserDisconnect() {
     this.broadcast.emit('online-players', getOnlinePlayers());
 }
 
-function handleClick(clickedTimeByUsers) {
-	
-	console.log(clickedTimeByUsers)
-	// function findHighestScore() {
-	// 	let highScoreSoFar = 0;
-	// 	let result;
-	// 	for (let i = 0; i < players.length; i++) {
-	// 		if (players[i].score > highScoreSoFar) {
-	// 			result = players[i];
-	// 			highScoreSoFar = players[i].score;
-	// 		}
-	// 	}
-	// 	return result;
-	// }
-	// winner = findHighestScore()
-	this.emit('reaction-time', clickedTimeByUsers)
-	// console.log('winner:', winner.username)
-}
-function handleRegisterUser(username, callback) {
-	users[this.id] = username;
-	callback({
-		joinGame: true,
-		usernameInUse: false,
-		onlineUsers: getOnlinePlayers(),
-	});
+function handleClick(playerData) {
 
-	this.broadcast.emit('online-players', getOnlinePlayers());
+	let player = {
+		name: playerData.username,
+		id: playerData.id,
+		clickedTime: playerData.clickedTime,
+		rounds: playerData.rounds,
+		clicks: playerData.clicks,
+	}
+	this.emit('reaction-time', playerData)
+	
+	players.push(player);
+	savedClickedTime[this.id] = player.clickedTime;
+
+
+	if (players.length === 2) {
+		let fastPlayerId = Object.keys(savedClickedTime).reduce((a, b) => savedClickedTime[a] < savedClickedTime[b] ? a : b);
+		let slowPlayerId = Object.keys(savedClickedTime).reduce((a, b) => savedClickedTime[a] > savedClickedTime[b] ? a : b);
+		console.log('fastPlayerId', fastPlayerId)
+
+		playerClicked = playerClicked + player.clicks;
+
+		players.forEach(player => {
+			if (player.id === fastPlayerId) {
+				player.score = score++;
+				console.log('player.score:', player.score)
+			}
+			if (player.id === slowPlayerId) {
+				player.score = score + 0;
+				console.log('player.score:', player.score)
+			}
+		})
+	
+		this.emit('show-score', players)
+	}
+
 }
 
 module.exports = function(socket) {
@@ -73,5 +93,7 @@ module.exports = function(socket) {
 	socket.on('positions', randomPositions)
 	
 	socket.on('clicked-time', handleClick)
+
    
-}
+	}
+

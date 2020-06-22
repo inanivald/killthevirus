@@ -6,12 +6,14 @@ const gameWrapperEl = document.querySelector('#game-wrapper');
 const usernameForm = document.querySelector('#username-form');
 const play = document.querySelector('#play');
 const gameboard = document.querySelector('#gameboard');
+const score = document.querySelector('#score');
 const x = 600;
 const y = 400;
 const virus = document.createElement('img');
 let points = 0;
 let username = null;
 let rounds = 0;
+let clicks = 0;
 const maxrounds = 10;
 
 
@@ -19,13 +21,19 @@ const updateOnlinePlayers = (users) => {
     document.querySelector('#online-players').innerHTML = users.map(user => `<li class="user">${user}</li>`).join("") ;
 }
 
-const addTime = (clickedTimeByUsers) => {
-    if (clickedTimeByUsers.username === document.querySelector('#username').value) {
-        document.querySelector('#time').innerHTML = `<p>Time: ${clickedTimeByUsers.clickedTime / 1000} seconds</p>`
+
+const addTime = (playerData) => {
+    if (playerData.username === document.querySelector('#username').value) {
+        document.querySelector('#time').innerHTML = `<p>Time: ${playerData.clickedTime / 1000} seconds</p>`
     }
 
 }
 
+const addScore = (players) => {
+    players.forEach(player => {
+		score.innerHTML += `<li>${player.name}: ${player.score}</li>`
+	})
+}
 
 usernameForm.addEventListener('submit', e => {
 	e.preventDefault();
@@ -51,21 +59,20 @@ const playGame = (randomY, randomX, time) => {
     gameboard.appendChild(virus);
 
     virus.addEventListener('click', () => {
-        const clickedTimeByUsers = {
+        rounds += 1;
+        clicks += 1;
+       
+        const playerData = {
             clickedTime: Date.now() - time,
-            username: document.querySelector('#username').value
+            username: document.querySelector('#username').value,
+            id: socket.id,
+            rounds,
+            clicks,
         }
-    
-        console.log('clickedTime', clickedTimeByUsers)
-        socket.emit('clicked-time', clickedTimeByUsers)
+
+        socket.emit('clicked-time', playerData)
         gameboard.removeChild(virus);
-        rounds += 1
-        socket.emit('positions', y, x, rounds)
-        
-        console.log('rounds:', rounds)
-        if (rounds === maxrounds) {
-            endgame()
-        }
+      
     })  
 }
 const endgame = () => {
@@ -84,7 +91,11 @@ socket.on('online-players', (users) => {
     socket.emit('positions', y, x)
 });
 
-socket.on('reaction-time', (clickedTimeByUsers) => {
-    addTime(clickedTimeByUsers)
+socket.on('reaction-time', (playerData) => {
+    addTime(playerData)
     
+})
+
+socket.on('show-score', (players) => {
+    addScore(players)
 })
