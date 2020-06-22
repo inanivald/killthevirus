@@ -4,36 +4,32 @@ let io = null;
 let savedClickedTime = {};
 let score = 0;
 let playerClicked = 0;
+let rounds = 0;
+const maxrounds = 10;
 
 function getOnlinePlayers() {
 	return Object.values(users);
 }
 
+function getRandomPositions() {
+	return {
+			x: 600 * Math.random(),
+			y: 800 * Math.random(),
+	};
+}
+
 function handleRegisterUser(username, callback) {
+
+	const randomPositions = getRandomPositions();
 	users[this.id] = username;
+	
 	callback({
 		joinGame: true,
-		usernameInUse: false,
 		onlineUsers: getOnlinePlayers(),
 	});
 
 	this.broadcast.emit('online-players', getOnlinePlayers());
-}
-
-function randomPositions(y, x) {
-	
-	let onlinePlayers = getOnlinePlayers();
-	
-	if (onlinePlayers.length === 2){
-		const randomY = y * Math.random()
-		const randomX = x * Math.random()
-		const seconds = Math.floor(Math.random() * 10)
-		setTimeout(function () {
-			const time = Date.now()
-			io.emit('virus-positions', randomY, randomX, time)
-		}, seconds * 1000);
-	}
-
+	io.emit('start-game', randomPositions)
 }
 
 function handleUserDisconnect() {
@@ -46,7 +42,8 @@ function handleUserDisconnect() {
 }
 
 function handleClick(playerData) {
-
+	const randomPositions = getRandomPositions();
+	rounds++
 	let player = {
 		name: playerData.username,
 		id: playerData.id,
@@ -63,7 +60,6 @@ function handleClick(playerData) {
 	if (players.length === 2) {
 		let fastPlayerId = Object.keys(savedClickedTime).reduce((a, b) => savedClickedTime[a] < savedClickedTime[b] ? a : b);
 		let slowPlayerId = Object.keys(savedClickedTime).reduce((a, b) => savedClickedTime[a] > savedClickedTime[b] ? a : b);
-		console.log('fastPlayerId', fastPlayerId)
 
 		playerClicked = playerClicked + player.clicks;
 
@@ -80,7 +76,10 @@ function handleClick(playerData) {
 	
 		this.emit('show-score', players)
 	}
+	if (rounds < maxrounds) {
+		io.emit('new-round', randomPositions);
 
+}
 }
 
 module.exports = function(socket) {
@@ -89,8 +88,6 @@ module.exports = function(socket) {
 	socket.on('disconnect', handleUserDisconnect);
 
     socket.on('register-player', handleRegisterUser);
-
-	socket.on('positions', randomPositions)
 	
 	socket.on('clicked-time', handleClick)
 
