@@ -1,9 +1,6 @@
 const users = {};
 let players = [];
 let io = null;
-let savedClickedTime = {};
-let score = 0;
-let playerClicked = 0;
 let rounds = 0;
 const maxrounds = 10;
 
@@ -18,8 +15,11 @@ function getRandomPositions() {
 	};
 }
 
-function handleRegisterUser(username, callback) {
+const getScore = function() {
+	return players.map(player => player.score);
+}
 
+function handleRegisterUser(username, callback) {
 	const randomPositions = getRandomPositions();
 	users[this.id] = username;
 	
@@ -29,8 +29,19 @@ function handleRegisterUser(username, callback) {
 	});
 
 	this.broadcast.emit('online-players', getOnlinePlayers());
-	io.emit('start-game', randomPositions)
+	this.emit('start-game', randomPositions)
+	
 }
+
+// function handleStartGame() {
+// 	let onlinePlayers = getOnlinePlayers();
+// 	console.log('onlinePlayers', onlinePlayers)
+// 	const randomPositions = getRandomPositions();
+// 	if (onlinePlayers.length === 2){
+	
+// 	}
+// }
+
 
 function handleUserDisconnect() {
 	if (users[this.id]) {
@@ -49,38 +60,35 @@ function handleClick(playerData) {
 		id: playerData.id,
 		clickedTime: playerData.clickedTime,
 		rounds: playerData.rounds,
-		clicks: playerData.clicks,
+		score: playerData.score
 	}
 	this.emit('reaction-time', playerData)
+
 	
 	players.push(player);
-	savedClickedTime[this.id] = player.clickedTime;
-
-
+	console.log('players', players)
+	// compare the two players reaction time
 	if (players.length === 2) {
-		let fastPlayerId = Object.keys(savedClickedTime).reduce((a, b) => savedClickedTime[a] < savedClickedTime[b] ? a : b);
-		let slowPlayerId = Object.keys(savedClickedTime).reduce((a, b) => savedClickedTime[a] > savedClickedTime[b] ? a : b);
+	const time = players[0].clickedTime - players[1].clickedTime;
 
-		playerClicked = playerClicked + player.clicks;
-
-		players.forEach(player => {
-			if (player.id === fastPlayerId) {
-				player.score = score++;
-				console.log('player.score:', player.score)
-			}
-			if (player.id === slowPlayerId) {
-				player.score = score + 0;
-				console.log('player.score:', player.score)
-			}
-		})
-	
-		this.emit('show-score', players)
+	// give the one with the shortest time the point
+	if(time < 0) {
+		players[0].score += 1;
+		
+	} else {
+		players[1].score += 1;
 	}
-	if (rounds < maxrounds) {
-		io.emit('new-round', randomPositions);
+	}
+	const scoreResult = getScore();
+	
+		this.emit('show-score', players, scoreResult)
+		if (rounds < maxrounds) {
+			io.emit('new-round', randomPositions);
+	}
+	
 
 }
-}
+
 
 module.exports = function(socket) {
 

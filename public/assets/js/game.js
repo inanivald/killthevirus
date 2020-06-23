@@ -9,13 +9,9 @@ const gameboard = document.querySelector('#gameboard');
 const messageEl = document.querySelector('#info');
 const score = document.querySelector('#score');
 const onlinePlayersEl = document.querySelector('#online-players')
-const x = 600;
-const y = 800;
 const virus = document.createElement('img');
-let points = 0;
-let username = null;
 let rounds = 0;
-let clicks = 0;
+let username = null;
 const maxrounds = 10;
 let virusShown = null;
 
@@ -28,7 +24,6 @@ const addMessage = (data) => {
 	messageEl.innerHTML = "";
 	const message = document.createElement('li');
 
-	// notification.classList.add('notification');
 	message.innerHTML = data;
 
 	messageEl.appendChild(message);
@@ -42,7 +37,7 @@ const addTime = (playerData) => {
 
 const addScore = (players) => {
     players.forEach(player => {
-		score.innerHTML += `<li>${player.name}: ${player.score}</li>`
+		score.innerHTML = `<li>${player.name}: ${player.score}</li>`
 	})
 }
 
@@ -60,29 +55,22 @@ usernameForm.addEventListener('submit', e => {
     })
 });
 
-const imgCoordinates = (target) => {
-	virus.style.display = "inline";
-	virus.style.left = target.x + "px";
-	virus.style.top = target.y + "px";
-}
 
 const startGame = (randomPositions) => {
-    addMessage("Starting game...");
-
-	setTimeout(() => {
-		messageEl.innerHTML = "";
-		playGame(randomPositions);
-    }, 3000);
     
+        addMessage("Starting game...");
+    
+        setTimeout(() => {
+            messageEl.innerHTML = "";
+            playGame(randomPositions);
+        }, 3000);     
 }
 
 const playGame = (randomPositions) => {
-    console.log('Random positions:', randomPositions)
     virus.src = "https://fed19.thehiveresistance.com/wp-content/uploads/2020/06/a.svg";
     virus.style.position = "absolute";
-    virus.style.top = y + 'px';
-    virus.style.left = x + 'px';
-    console.log('randomPositions:', randomPositions)
+    virus.style.top = randomPositions.y + 'px';
+    virus.style.left = randomPositions.x + 'px';
 
     setTimeout(function () {
         gameboard.appendChild(virus)
@@ -92,18 +80,18 @@ const playGame = (randomPositions) => {
 }
 
 virus.addEventListener('click', () => {
-    rounds += 1;
-    clicks += 1;
-   
+    gameboard.removeChild(virus);
+    rounds++
     const playerData = {
         clickedTime: Date.now() - virusShown,
         username: document.querySelector('#username').value,
         id: socket.id,
         rounds,
-        clicks,
+        score: 0,
     }
+    console.log('playerData:', playerData)
     socket.emit('clicked-time', playerData)
-    gameboard.removeChild(virus);
+    
 })  
 
 const endgame = () => {
@@ -111,20 +99,16 @@ const endgame = () => {
 	gameWrapperEl.classList.add('hide');
 }
 
-
 socket.on('start-game', (randomPositions) => {
     startGame(randomPositions)
 })
 
 socket.on('online-players', (users) => {
     updateOnlinePlayers(users);
-
 });
 
 socket.on('reaction-time', (playerData) => {
-    addTime(playerData)
-
-    
+    addTime(playerData)  
 })
 
 socket.on('show-score', (players) => {
@@ -132,5 +116,5 @@ socket.on('show-score', (players) => {
 })
 
 socket.on('new-round', (randomPositions) => {
-    startGame(randomPositions)
+    playGame(randomPositions)
 })
