@@ -21,6 +21,7 @@ const getScore = function() {
 
 function handleRegisterUser(username, callback) {
 	const randomPositions = getRandomPositions();
+	let onlinePlayers = getOnlinePlayers()
 	users[this.id] = username;
 	
 	callback({
@@ -29,19 +30,10 @@ function handleRegisterUser(username, callback) {
 	});
 
 	this.broadcast.emit('online-players', getOnlinePlayers());
-	this.emit('start-game', randomPositions)
-	
+	if (onlinePlayers.length === 1) {
+		this.emit('start-game', randomPositions)
+	}
 }
-
-// function handleStartGame() {
-// 	let onlinePlayers = getOnlinePlayers();
-// 	console.log('onlinePlayers', onlinePlayers)
-// 	const randomPositions = getRandomPositions();
-// 	if (onlinePlayers.length === 2){
-	
-// 	}
-// }
-
 
 function handleUserDisconnect() {
 	if (users[this.id]) {
