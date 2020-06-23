@@ -23,9 +23,7 @@ const updateOnlinePlayers = (users) => {
 const addMessage = (data) => {
 	messageEl.innerHTML = "";
 	const message = document.createElement('li');
-
 	message.innerHTML = data;
-
 	messageEl.appendChild(message);
 }
 
@@ -57,7 +55,7 @@ usernameForm.addEventListener('submit', e => {
 
 
 const startGame = (randomPositions) => {
-    
+
         addMessage("Starting game...");
     
         setTimeout(() => {
@@ -76,7 +74,6 @@ const playGame = (randomPositions) => {
         gameboard.appendChild(virus)
         virusShown = Date.now();
     }, Math.floor(Math.random() * 10) * 1000)
-   
 }
 
 virus.addEventListener('click', () => {
@@ -89,9 +86,7 @@ virus.addEventListener('click', () => {
         rounds,
         score: 0,
     }
-    console.log('playerData:', playerData)
-    socket.emit('clicked-time', playerData)
-    
+    socket.emit('clicked-time', playerData)   
 })  
 
 const endgame = () => {
