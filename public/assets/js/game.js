@@ -23,7 +23,9 @@ const updateOnlinePlayers = (users) => {
 const addMessage = (data) => {
 	messageEl.innerHTML = "";
 	const message = document.createElement('li');
+
 	message.innerHTML = data;
+
 	messageEl.appendChild(message);
 }
 
@@ -55,7 +57,7 @@ usernameForm.addEventListener('submit', e => {
 
 
 const startGame = (randomPositions) => {
-
+    
         addMessage("Starting game...");
     
         setTimeout(() => {
@@ -64,34 +66,52 @@ const startGame = (randomPositions) => {
         }, 3000);     
 }
 
-const playGame = (randomPositions) => {
-    virus.src = "https://fed19.thehiveresistance.com/wp-content/uploads/2020/06/a.svg";
+const virusPositions = (randomPositions) => {
     virus.style.position = "absolute";
-    virus.style.top = randomPositions.y + 'px';
-    virus.style.left = randomPositions.x + 'px';
+    virus.style.display = "inline";
+    virus.style.left = randomPositions.x + "px";
+    virus.style.top = randomPositions.y + "px";
+}
 
-    setTimeout(function () {
-        gameboard.appendChild(virus)
-        virusShown = Date.now();
-    }, Math.floor(Math.random() * 10) * 1000)
+const playGame = (randomPositions) => {
+    virus.style.display = "none";
+
+	setTimeout(() => {
+		virusPositions(randomPositions);
+        virusShown = Date.now();;
+	}, randomPositions.randomDelay);
 }
 
 virus.addEventListener('click', () => {
-    gameboard.removeChild(virus);
-    rounds++
+    score++;
     const playerData = {
         clickedTime: Date.now() - virusShown,
         username: document.querySelector('#username').value,
-        id: socket.id,
-        rounds,
-        score: 0,
+        score,
     }
-    socket.emit('clicked-time', playerData)   
+    console.log('playerData:', playerData)
+    socket.emit('clicked-time', playerData)
+    
 })  
 
-const endgame = () => {
+const playAgain = () => {
 	playagainEl.classList.remove('hide');
-	gameWrapperEl.classList.add('hide');
+    gameWrapperEl.classList.add('hide');
+
+    usernameForm.addEventListener('submit', e => {
+        e.preventDefault();
+    
+        const username = document.querySelector('#username').value;
+        socket.emit('register-player', username, (status) => {
+            if (status.joinGame) {
+                playagainEl.classList.add('hide');
+                gameWrapperEl.classList.remove('hide');
+    
+                updateOnlinePlayers(status.onlineUsers);
+            }
+        })
+    });
+    
 }
 
 socket.on('start-game', (randomPositions) => {

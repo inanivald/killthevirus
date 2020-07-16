@@ -25,15 +25,26 @@
         <div class="container">
             <div id="game-wrapper" class="hide">
             	<div id="gameboard">
-
+                        <div id="winner" class="hide"></div>
+                        <div id="loser" class="hide"></div>
+                        <div id="tie" class="hide"></div>
+        
+                        <div id="face">
+                            <img id="virus" class="hide" src="https://fed19.thehiveresistance.com/wp-content/uploads/2020/06/a.svg" alt="Virus img">
+                        </div><!-- #face -->
                 </div> <!-- /#gameboard -->
 
-                <div id="players">
-                    <h2>Players:</h2>
+                <div id="players-info">
+                    <h3>Players:</h3>
                     <ul id="online-players"></ul>
-					<p id="time"></p>
+                    <h3>Rounds played:</h3>
+                    <ul id="rounds"></ul>
+                    <h3>Time:</h3>
+                    <ul id="time"></ul>
+                    <h3>Score:</h3>
 					<ul id="score"></ul>
-					<ul id="info"></ul>
+                    <ul id="info"></ul>
+                    <div id="timer"></div>
 				</div><!-- /#players -->
             </div><!-- /#game-wrapper -->
 		</div><!-- /container -->
@@ -42,7 +53,6 @@
                 <form id="username-form">
 					<h1>Would you like to play again?</h1>
                     <div class="form-group">
-                        <input type="text" id="username" class="form-control form-control-lg" required placeholder="Username">
                         <button id="play" type="submit" class="btn btn-primary ">Yes</button>
                     </div>
                 </form><!-- /#username-form -->

@@ -1,7 +1,7 @@
-
-let io = null;
 const users = {};
 let players = [];
+let player = {}
+let io = null;
 let rounds = 0;
 const maxrounds = 10;
 
@@ -13,13 +13,21 @@ function getRandomPositions() {
 	return {
 			x: 600 * Math.random(),
 			y: 800 * Math.random(),
-	};
+			randomDelay: Math.floor(Math.random() * 10),
+	}
 }
 
 function handleRegisterUser(username, callback) {
 	const randomPositions = getRandomPositions();
 	let onlinePlayers = getOnlinePlayers()
 	users[this.id] = username;
+
+	player = {
+		playerId: this.id,
+		name: username,
+		score: 0,
+		reactionTime: "",
+	}
 	
 	callback({
 		joinGame: true,
@@ -44,41 +52,32 @@ function handleUserDisconnect() {
 function handleClick(playerData) {
 	const randomPositions = getRandomPositions();
 	rounds++
-	let player = {
-		name: playerData.username,
-		id: playerData.id,
-		clickedTime: playerData.clickedTime,
-		rounds: playerData.rounds,
-		score: playerData.score
-	}
+	const playerIndex = players.findIndex((player => player.playerId === this.id));
+	players[playerIndex].name = playerData.username;
+	players[playerIndex].score = playerData.score;
+	players[playerIndex].clickedTime = playerData.clickedTime;
 	this.emit('reaction-time', playerData)
 
-	players.push(player);
-
-
-	if (players.length === 2) {
-		const time = players[0].clickedTime - players[1].clickedTime;
-
-		if(time < 0) {
-			players[0].score += 1;
-			
-		} else {
-			players[1].score += 1;
-		}
+	const gameData = {
+		players,
+		rounds,
 	}
-		this.emit('show-score', players)
-		if (rounds < maxrounds) {
-			io.emit('new-round', randomPositions);
+	console.log('gamedata', gameData)
+	if (rounds < maxrounds) {
+		io.emit('new-round', randomPositions, gameData);
+	} else if (rounds === maxrounds) {
+		getWinner();
+		rounds = 0;
 	}
 }
 
 module.exports = function(socket) {
-	io = this;
 
+	io = this;
 	socket.on('disconnect', handleUserDisconnect);
 
     socket.on('register-player', handleRegisterUser);
 	
 	socket.on('clicked-time', handleClick)
-}
 
+	}

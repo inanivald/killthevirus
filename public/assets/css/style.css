@@ -36,11 +36,11 @@ body {
 #game-wrapper {
 	display: flex;
 	align-items: center;
-	justify-content: center
+	justify-content: center;
 
 }
 
-#gameboard {
+#face {
 	background-image: url("../images/face.png");
 	background-position: center;
 	background-repeat: no-repeat;
@@ -53,14 +53,25 @@ body {
 	height: 50px;
 }
 
-#players {
+#players-info {
 	margin: 0.5rem;
 }
 
-#players ul {
+#players-info ul {
 	margin-bottom: 1rem;
 	list-style: none;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 
+#players-info h3 {
+	padding-bottom: 0.5rem;
+	padding-top: 0.5rem;
+} 
 
+#winner, #loser {
+	align-items: center;
+	justify-content: center;
+}
 
