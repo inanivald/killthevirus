@@ -17,6 +17,21 @@ function getRandomPositions() {
 	}
 }
 
+function getWinner() {
+	const winner = players.reduce((a, b) => a.score > b.score ? a : b);
+	const loser = players.reduce((a, b) => a.score < b.score ? a : b);
+	const tie = players.reduce((a, b) => {
+		if (a.score === b.score) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+
+	io.to(winner.playerId).emit('winner', winner, tie);
+	io.to(loser.playerId).emit('loser', loser, tie);
+}
+
 function handleRegisterUser(username, callback) {
 	const randomPositions = getRandomPositions();
 	let onlinePlayers = getOnlinePlayers()

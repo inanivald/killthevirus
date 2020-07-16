@@ -66,6 +66,38 @@ const startGame = (randomPositions) => {
         }, 3000);     
 }
 
+const handleWinner = (player, tie) => {
+	if (tie) {
+		winner.innerHTML = `<h3>It's a tie!</h3>`
+	} else { winner.innerHTML =`<h3>You are the winner ${player.name}!</h3>
+        <p>Your score was ${player.score}/${maxrounds}</p>
+	`
+	}
+	winner.classList.remove("hide");
+    face.classList.add("hide");
+	playersEL.classList.add("hide");
+
+	setTimeout(() => {
+		playAgain()
+	}, 5000);
+}
+
+const handleLoser = (player, tie) => {
+	if (tie) {
+		loser.innertext = `<h3>It's a tie!</h3>`
+	} else { loser.innerHTML = `<h3>Sorry, ${player.name}, you lost!</h3>
+		<p>Your score was ${player.score}/${maxrounds}</p>
+	`
+	}
+	loser.classList.remove("hide");
+    face.classList.add("hide");
+	playersEL.classList.add("hide");
+	
+	setTimeout(() => {
+		playAgain()
+	}, 5000);
+    
+}
 const virusPositions = (randomPositions) => {
     virus.style.position = "absolute";
     virus.style.display = "inline";
@@ -133,3 +165,11 @@ socket.on('show-score', (players) => {
 socket.on('new-round', (randomPositions) => {
     playGame(randomPositions)
 })
+
+socket.on('winner', (winner, tie) => {
+	handleWinner(winner, tie);
+});
+
+socket.on('loser', (loser, tie) => {
+	handleLoser(loser, tie)
+});
