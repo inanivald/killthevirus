@@ -3,18 +3,21 @@ const socket = io();
 const startEl = document.querySelector('#start');
 const playagainEl = document.querySelector('#playagain');
 const gameWrapperEl = document.querySelector('#game-wrapper');
+const winner = document.querySelector('#winner');
+const loser = document.querySelector('#loser');
+const roundsEl = document.querySelector('#rounds');
 const usernameForm = document.querySelector('#username-form');
-const play = document.querySelector('#play');
+const playersEL = document.querySelector('#players-info');
 const gameboard = document.querySelector('#gameboard');
 const messageEl = document.querySelector('#info');
-const score = document.querySelector('#score');
+const scoreEl = document.querySelector('#score');
 const onlinePlayersEl = document.querySelector('#online-players')
-const virus = document.createElement('img');
+const virus = document.getElementById('virus');
 let rounds = 0;
 let username = null;
 const maxrounds = 10;
 let virusShown = null;
-
+let score = 0;
 
 const updateOnlinePlayers = (users) => {
     onlinePlayersEl.innerHTML = users.map(user => `<li class="user">${user}</li>`).join("") ;
@@ -23,9 +26,7 @@ const updateOnlinePlayers = (users) => {
 const addMessage = (data) => {
 	messageEl.innerHTML = "";
 	const message = document.createElement('li');
-
 	message.innerHTML = data;
-
 	messageEl.appendChild(message);
 }
 
@@ -54,17 +55,6 @@ usernameForm.addEventListener('submit', e => {
         }
     })
 });
-
-
-const startGame = (randomPositions) => {
-    
-        addMessage("Starting game...");
-    
-        setTimeout(() => {
-            messageEl.innerHTML = "";
-            playGame(randomPositions);
-        }, 3000);     
-}
 
 const handleWinner = (player, tie) => {
 	if (tie) {
@@ -105,13 +95,24 @@ const virusPositions = (randomPositions) => {
     virus.style.top = randomPositions.y + "px";
 }
 
-const playGame = (randomPositions) => {
-    virus.style.display = "none";
+const startGame = (randomPositions, players) => {
+    addMessage("Starting game ...");
+if (players.length === 2) {
+    setTimeout(() => {
+        messageEl.innerHTML = "";
+        virus.classList.remove('hide');
+        playGame(randomPositions);
+    }, 3000);  
+}   
+}
 
-	setTimeout(() => {
-		virusPositions(randomPositions);
-        virusShown = Date.now();;
-	}, randomPositions.randomDelay);
+const playGame = (randomPositions) => {
+virus.style.display = "none";
+
+setTimeout(() => {
+    virusPositions(randomPositions);
+    virusShown = Date.now();;
+}, randomPositions.randomDelay);
 }
 
 virus.addEventListener('click', () => {
@@ -121,7 +122,6 @@ virus.addEventListener('click', () => {
         username: document.querySelector('#username').value,
         score,
     }
-    console.log('playerData:', playerData)
     socket.emit('clicked-time', playerData)
     
 })  
@@ -143,11 +143,10 @@ const playAgain = () => {
             }
         })
     });
-    
 }
 
-socket.on('start-game', (randomPositions) => {
-    startGame(randomPositions)
+socket.on('start-game', (randomPositions, players) => {
+    startGame(randomPositions, players)
 })
 
 socket.on('online-players', (users) => {
@@ -163,6 +162,7 @@ socket.on('show-score', (players) => {
 })
 
 socket.on('new-round', (randomPositions) => {
+    virusPositions(randomPositions)
     playGame(randomPositions)
 })
 
