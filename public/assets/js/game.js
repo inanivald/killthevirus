@@ -32,14 +32,20 @@ const addMessage = (data) => {
 
 const addTime = (playerData) => {
     if (playerData.username === document.querySelector('#username').value) {
-        document.querySelector('#time').innerHTML = `<p>Time: ${playerData.clickedTime / 1000} seconds</p>`
+        document.querySelector('#time').innerHTML = `<li>${playerData.clickedTime / 1000} seconds</li>`
     }
 }
 
 const addScore = (players) => {
-    players.forEach(player => {
-		score.innerHTML = `<li>${player.name}: ${player.score}</li>`
-	})
+    scoreEl.innerHTML = "";
+	scoreEl.innerHTML = players.map(player => `<li>${player.name}: ${player.score}</li>`).join("");
+}
+
+const addRound = (rounds) => {
+	roundsEl.innerHTML = "";
+	const roundEl = document.createElement('li');
+	roundEl.innerHTML = `${rounds}/${maxrounds}`;
+	roundsEl.appendChild(roundEl);
 }
 
 usernameForm.addEventListener('submit', e => {
@@ -163,6 +169,8 @@ socket.on('show-score', (players) => {
 
 socket.on('new-round', (randomPositions) => {
     virusPositions(randomPositions)
+    addScore(gameData.players)
+    addRound(gameData.rounds)
     playGame(randomPositions)
 })
 

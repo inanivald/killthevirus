@@ -5,8 +5,12 @@ let io = null;
 let rounds = 0;
 const maxrounds = 10;
 
-function getOnlinePlayers() {
-	return Object.values(users);
+function getPlayerNames() {
+	return players.map(player => player.name);
+}
+
+function getPlayerById(id) {
+	return players.find(player => player.playerId === id);
 }
 
 function getRandomPositions() {
@@ -56,12 +60,19 @@ function handleRegisterUser(username, callback) {
 }
 
 function handleUserDisconnect() {
-	if (users[this.id]) {
-		this.broadcast.emit('user-disconnected', users[this.id]);
-	}
-	delete users[this.id];
+	
+	const player = getPlayerById(this.id);
 
-    this.broadcast.emit('online-players', getOnlinePlayers());
+	this.broadcast.emit('player-disconnected', player)
+
+	for (let i =0; i < players.length; i++) {
+		if (players[i].playerId === this.id) {
+			players.splice(i,1);
+			break;
+		}
+	}
+
+	io.emit('online-players', getPlayerNames());
 }
 
 function handleClick(playerData) {
