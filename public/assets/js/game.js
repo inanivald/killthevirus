@@ -19,8 +19,9 @@ const maxrounds = 10;
 let virusShown = null;
 let score = 0;
 
-const updateOnlinePlayers = (users) => {
-    onlinePlayersEl.innerHTML = users.map(user => `<li class="user">${user}</li>`).join("") ;
+
+const updateOnlinePlayers = (players) => {
+    onlinePlayersEl.innerHTML = players.map(player => `<li class="user">${player}</li>`).join("") ;
 }
 
 const addMessage = (data) => {
@@ -48,24 +49,10 @@ const addRound = (rounds) => {
 	roundsEl.appendChild(roundEl);
 }
 
-usernameForm.addEventListener('submit', e => {
-	e.preventDefault();
-
-	const username = document.querySelector('#username').value;
-	socket.emit('register-player', username, (status) => {
-        if (status.joinGame) {
-            startEl.classList.add('hide');
-            gameWrapperEl.classList.remove('hide');
-
-            updateOnlinePlayers(status.onlineUsers);
-        }
-    })
-});
-
 const handleWinner = (player, tie) => {
 	if (tie) {
 		winner.innerHTML = `<h3>It's a tie!</h3>`
-	} else { winner.innerHTML =`<h3>You are the winner ${player.name}!</h3>
+	} else { winner.innerHTML =`<h3>You are the winner, ${player.name}!</h3>
         <p>Your score was ${player.score}/${maxrounds}</p>
 	`
 	}
@@ -92,8 +79,8 @@ const handleLoser = (player, tie) => {
 	setTimeout(() => {
 		playAgain()
 	}, 5000);
-    
 }
+
 const virusPositions = (randomPositions) => {
     virus.style.position = "absolute";
     virus.style.display = "inline";
@@ -101,24 +88,39 @@ const virusPositions = (randomPositions) => {
     virus.style.top = randomPositions.y + "px";
 }
 
+usernameForm.addEventListener('submit', e => {
+	e.preventDefault();
+
+	const username = document.querySelector('#username').value;
+	socket.emit('register-player', username, (status) => {
+        if (status.joinGame) {
+            startEl.classList.add('hide');
+            gameWrapperEl.classList.remove('hide');
+
+            updateOnlinePlayers(status.onlinePlayers);
+        }
+    })
+});
+
 const startGame = (randomPositions, players) => {
-    addMessage("Starting game ...");
-if (players.length === 2) {
-    setTimeout(() => {
-        messageEl.innerHTML = "";
-        virus.classList.remove('hide');
-        playGame(randomPositions);
-    }, 3000);  
-}   
+        addMessage("Starting game ...");
+
+    if (players.length === 2) {
+        setTimeout(() => {
+            messageEl.innerHTML = "";
+            virus.classList.remove('hide');
+            playGame(randomPositions);
+        }, 3000);  
+    }   
 }
 
 const playGame = (randomPositions) => {
-virus.style.display = "none";
+    virus.style.display = "none";
 
-setTimeout(() => {
-    virusPositions(randomPositions);
-    virusShown = Date.now();;
-}, randomPositions.randomDelay);
+	setTimeout(() => {
+		virusPositions(randomPositions);
+        virusShown = Date.now();;
+	}, randomPositions.randomDelay);
 }
 
 virus.addEventListener('click', () => {
@@ -129,7 +131,6 @@ virus.addEventListener('click', () => {
         score,
     }
     socket.emit('clicked-time', playerData)
-    
 })  
 
 const playAgain = () => {
@@ -149,29 +150,26 @@ const playAgain = () => {
             }
         })
     });
+    
 }
 
 socket.on('start-game', (randomPositions, players) => {
     startGame(randomPositions, players)
 })
 
-socket.on('online-players', (users) => {
-    updateOnlinePlayers(users);
+socket.on('online-players', (players) => {
+    updateOnlinePlayers(players);
 });
 
 socket.on('reaction-time', (playerData) => {
     addTime(playerData)  
 })
 
-socket.on('show-score', (players) => {
-    addScore(players)
-})
-
-socket.on('new-round', (randomPositions) => {
+socket.on('new-round', (randomPositions, gameData) => {
     virusPositions(randomPositions)
     addScore(gameData.players)
     addRound(gameData.rounds)
-    playGame(randomPositions)
+    playGame(randomPositions);
 })
 
 socket.on('winner', (winner, tie) => {
@@ -181,3 +179,6 @@ socket.on('winner', (winner, tie) => {
 socket.on('loser', (loser, tie) => {
 	handleLoser(loser, tie)
 });
+
+
+

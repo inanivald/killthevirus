@@ -38,25 +38,23 @@ function getWinner() {
 
 function handleRegisterUser(username, callback) {
 	const randomPositions = getRandomPositions();
-	let onlinePlayers = getOnlinePlayers()
 	users[this.id] = username;
-
+	
 	player = {
 		playerId: this.id,
 		name: username,
 		score: 0,
-		reactionTime: "",
+		clickedTime: "",
 	}
-	
-	callback({
-		joinGame: true,
-		onlineUsers: getOnlinePlayers(),
-	});
+		players.push(player)
 
-	this.broadcast.emit('online-players', getOnlinePlayers());
-	if (onlinePlayers.length === 1) {
-		this.emit('start-game', randomPositions)
-	}
+		callback({
+			joinGame: true,
+			onlinePlayers: getPlayerNames(),
+		});
+	
+	io.emit('online-players', getPlayerNames());
+	io.emit('start-game', randomPositions, players);
 }
 
 function handleUserDisconnect() {
@@ -88,7 +86,7 @@ function handleClick(playerData) {
 		players,
 		rounds,
 	}
-	console.log('gamedata', gameData)
+
 	if (rounds < maxrounds) {
 		io.emit('new-round', randomPositions, gameData);
 	} else if (rounds === maxrounds) {
