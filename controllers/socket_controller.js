@@ -1,7 +1,8 @@
+let io = null;
+
 const users = {};
 let players = [];
 let player = {}
-let io = null;
 let rounds = 0;
 const maxrounds = 10;
 

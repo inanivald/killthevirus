@@ -3,8 +3,8 @@ const socket = io();
 const startEl = document.querySelector('#start');
 const playagainEl = document.querySelector('#playagain');
 const gameWrapperEl = document.querySelector('#game-wrapper');
-const winner = document.querySelector('#winner');
-const loser = document.querySelector('#loser');
+const winnerEl = document.querySelector('#winner');
+const loserEl = document.querySelector('#loser');
 const roundsEl = document.querySelector('#rounds');
 const usernameForm = document.querySelector('#username-form');
 const playersEL = document.querySelector('#players-info');
@@ -49,14 +49,14 @@ const addRound = (rounds) => {
 	roundsEl.appendChild(roundEl);
 }
 
-const handleWinner = (player, tie) => {
+const handleWinner = (winner, tie) => {
 	if (tie) {
-		winner.innerHTML = `<h3>It's a tie!</h3>`
-	} else { winner.innerHTML =`<h3>You are the winner, ${player.name}!</h3>
-        <p>Your score was ${player.score}/${maxrounds}</p>
+		winnerEl.innerHTML = `<h3>It's a tie!</h3>`
+	} else { winnerEl.innerHTML =`<h3>You are the winner, ${winner.name}!</h3>
+        <p>Your score was ${winner.score}/${maxrounds}</p>
 	`
 	}
-	winner.classList.remove("hide");
+	winnerEl.classList.remove("hide");
     face.classList.add("hide");
 	playersEL.classList.add("hide");
 
@@ -65,14 +65,14 @@ const handleWinner = (player, tie) => {
 	}, 5000);
 }
 
-const handleLoser = (player, tie) => {
+const handleLoser = (loser, tie) => {
 	if (tie) {
-		loser.innertext = `<h3>It's a tie!</h3>`
-	} else { loser.innerHTML = `<h3>Sorry, ${player.name}, you lost!</h3>
-		<p>Your score was ${player.score}/${maxrounds}</p>
+		loserEl.innertext = `<h3>It's a tie!</h3>`
+	} else { loserEl.innerHTML = `<h3>Sorry, ${loser.name}, you lost!</h3>
+		<p>Your score was ${loser.score}/${maxrounds}</p>
 	`
 	}
-	loser.classList.remove("hide");
+	loserEl.classList.remove("hide");
     face.classList.add("hide");
 	playersEL.classList.add("hide");
 	
@@ -119,7 +119,7 @@ const playGame = (randomPositions) => {
 
 	setTimeout(() => {
 		virusPositions(randomPositions);
-        virusShown = Date.now();;
+        virusShown = Date.now();
 	}, randomPositions.randomDelay);
 }
 
